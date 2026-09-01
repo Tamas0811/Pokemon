@@ -1,13 +1,16 @@
-// Populate the scrollable list on page load
+// Populate the scrollable list on page load (sorted alphabetically)
 document.addEventListener("DOMContentLoaded", async () => {
   const selectEl = document.getElementById("pokemonSelect");
   try {
-    // Fetches the first 151 original Pokémon (adjust limit as needed)
+    // Fetches the first 151 original Pokémon
     const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
     const data = await res.json();
 
+    // Sort Pokémon alphabetically by name
+    const sortedPokemon = data.results.sort((a, b) => a.name.localeCompare(b.name));
+
     selectEl.innerHTML = "";
-    data.results.forEach((poke) => {
+    sortedPokemon.forEach((poke) => {
       const option = document.createElement("option");
       option.value = poke.name;
       option.textContent = poke.name.toUpperCase();
