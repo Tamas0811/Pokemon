@@ -3,13 +3,22 @@ async function checkEvolution() {
   const resultDiv = document.getElementById('result');
   if (!input) return;
 
-  resultDiv.innerHTML = "Searching...";
+  resultDiv.innerHTML = "<p>Searching...</p>";
 
   try {
+    // 1. Fetch current Pokémon data
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${input}`);
     if (!response.ok) throw new Error("Pokémon not found");
     const data = await response.json();
 
+    // Helper functions for stats & types
+    const getTypes = (poke) => poke.types.map(t => t.type.name).join(', ');
+    const getBst = (poke) => poke.stats.reduce((sum, s) => sum + s.base_stat, 0);
+
+    const currentTypes = getTypes(data);
+    const currentBst = getBst(data);
+
+    // 2. Fetch species & evolution chain
     const speciesResponse = await fetch(data.species.url);
     const speciesData = await speciesResponse.json();
 
@@ -29,29 +38,41 @@ async function checkEvolution() {
       }
     }
 
+    // 3. Render Output
     if (evolvesTo) {
       const evoPokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolvesTo}`);
       const evoPokemonData = await evoPokemonResponse.json();
 
+      const evoTypes = getTypes(evoPokemonData);
+      const evoBst = getBst(evoPokemonData);
+      const bstDiff = evoBst - currentBst;
+
       resultDiv.innerHTML = `
         <h2>Yes, you should evolve ${data.name.toUpperCase()}!</h2>
-        <div style="display:flex; gap: 20px; align-items:center;">
+        <p><strong>Stat Gain:</strong> +${bstDiff} Base Stat Total</p>
+        <div style="display:flex; gap: 30px; align-items:center; justify-content:center; margin-top: 15px;">
           <div>
-            <p>Current: ${data.name}</p>
-            <img src="${data.sprites.front_default}" alt="${data.name}">
+            <h3>${data.name.toUpperCase()}</h3>
+            <img src="${data.sprites.front_default}" alt="${data.name}" style="width:120px;">
+            <p><strong>Type:</strong> ${currentTypes}</p>
+            <p><strong>Base Stat Total:</strong> ${currentBst}</p>
           </div>
-          <h3>➔</h3>
+          <h2>➔</h2>
           <div>
-            <p>Evolves into: ${evoPokemonData.name}</p>
-            <img src="${evoPokemonData.sprites.front_default}" alt="${evoPokemonData.name}">
+            <h3>${evoPokemonData.name.toUpperCase()}</h3>
+            <img src="${evoPokemonData.sprites.front_default}" alt="${evoPokemonData.name}" style="width:120px;">
+            <p><strong>Type:</strong> ${evoTypes}</p>
+            <p><strong>Base Stat Total:</strong> ${evoBst}</p>
           </div>
         </div>
       `;
     } else {
       resultDiv.innerHTML = `
         <h2>No / Fully Evolved</h2>
-        <p>${data.name.toUpperCase()} does not evolve further.</p>
-        <img src="${data.sprites.front_default}" alt="${data.name}">
+        <p><strong>${data.name.toUpperCase()}</strong> does not evolve further.</p>
+        <img src="${data.sprites.front_default}" alt="${data.name}" style="width:120px;">
+        <p><strong>Type:</strong> ${currentTypes}</p>
+        <p><strong>Base Stat Total:</strong> ${currentBst}</p>
       `;
     }
   } catch (err) {
