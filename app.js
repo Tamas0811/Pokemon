@@ -1,24 +1,41 @@
-async function checkEvolution() {
-  const input = document.getElementById('pokemonInput').value.toLowerCase().trim();
+// Populate the scrollable list on page load
+document.addEventListener("DOMContentLoaded", async () => {
+  const selectEl = document.getElementById("pokemonSelect");
+  try {
+    // Fetches the first 151 original Pokémon (adjust limit as needed)
+    const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
+    const data = await res.json();
+
+    selectEl.innerHTML = "";
+    data.results.forEach((poke) => {
+      const option = document.createElement("option");
+      option.value = poke.name;
+      option.textContent = poke.name.toUpperCase();
+      selectEl.appendChild(option);
+    });
+  } catch (err) {
+    selectEl.innerHTML = "<option>Failed to load Pokémon</option>";
+  }
+});
+
+async function checkEvolution(selectedName) {
+  const input = selectedName || document.getElementById('pokemonSelect').value;
   const resultDiv = document.getElementById('result');
   if (!input) return;
 
   resultDiv.innerHTML = "<p>Searching...</p>";
 
   try {
-    // 1. Fetch current Pokémon data
     const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${input}`);
     if (!response.ok) throw new Error("Pokémon not found");
     const data = await response.json();
 
-    // Helper functions for stats & types
     const getTypes = (poke) => poke.types.map(t => t.type.name).join(', ');
     const getBst = (poke) => poke.stats.reduce((sum, s) => sum + s.base_stat, 0);
 
     const currentTypes = getTypes(data);
     const currentBst = getBst(data);
 
-    // 2. Fetch species & evolution chain
     const speciesResponse = await fetch(data.species.url);
     const speciesData = await speciesResponse.json();
 
@@ -38,7 +55,6 @@ async function checkEvolution() {
       }
     }
 
-    // 3. Render Output
     if (evolvesTo) {
       const evoPokemonResponse = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolvesTo}`);
       const evoPokemonData = await evoPokemonResponse.json();

@@ -8,10 +8,14 @@
 <body>
   <div class="container">
     <h1>Should I Evolve This Pokémon?</h1>
+    
     <div class="search-box">
-      <input type="text" id="pokemonInput" placeholder="Enter Pokémon name (e.g. pikachu)">
-      <button onclick="checkEvolution()">Check</button>
+      <!-- Scrollable selection list -->
+      <select id="pokemonSelect" size="6" onchange="checkEvolution(this.value)">
+        <option value="">Loading Pokémon list...</option>
+      </select>
     </div>
+
     <div id="result"></div>
   </div>
   <script src="app.js"></script>
