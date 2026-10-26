@@ -2,21 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Should I Evolve This Pokémon?</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
     <h1>Should I Evolve This Pokémon?</h1>
-    
+    <p class="subtitle">Pick a Pokémon to compare it with what it evolves into.</p>
+
     <div class="search-box">
-      <!-- Scrollable selection list -->
-      <select id="pokemonSelect" size="6" onchange="checkEvolution(this.value)">
-        <option value="">Loading Pokémon list...</option>
+      <input type="search" id="search" placeholder="Search by name…" autocomplete="off">
+      <select id="pokemonSelect" size="8">
+        <option value="">Loading Pokémon list…</option>
       </select>
     </div>
 
     <div id="result"></div>
+
+    <p class="footnote">
+      Data: <code>pokemon.csv</code> (Generations 1–6, 721 Pokémon). The verdict is based on base stats, types and abilities.
+      The data doesn't include evolution methods or move sets, so a Pokémon that learns a key move earlier before evolving isn't taken into account.
+    </p>
   </div>
   <script src="app.js"></script>
 </body>
